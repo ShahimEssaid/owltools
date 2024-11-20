@@ -33,23 +33,23 @@ public class EcoToolsTest extends OWLToolsTestBasics{
 		ParserWrapper pw = new ParserWrapper();
 
 		//NOTE: Yes, the GO here is unnecessary, but we're trying to also catch a certain behavior
-		// where auxilery ontologies are not caught. The best wat to do that here is to load ECO
+		// where auxilery ontologies are not caught. The best way to do that here is to load ECO
 		// second and then do the merge.
 		OWLOntology ont_main = pw.parse(getResourceIRIString("go_xp_predictor_test_subset.obo"));
-		OWLOntology ont_scnd = pw.parse(getResourceIRIString("eco.obo"));
+		OWLOntology ont_scnd = pw.parse(getResourceIRIString("eco.20211012.obo"));
 		g = new OWLGraphWrapper(ont_main);
 		g.addSupportOntology(ont_scnd);
-		
+
 		// NOTE: This step is necessary or things will get ignored!
 		// (This cropped-up in the loader at one point.)
 		for (OWLOntology ont : g.getSupportOntologySet())
 			g.mergeOntology(ont);
-		
+
 		OWLReasonerFactory reasonerFactory = new ElkReasonerFactory();
 		r = reasonerFactory.createReasoner(g.getSourceOntology());
 		g.setReasoner(r);
 	}
-	
+
 	@AfterClass
 	public static void afterClass() throws Exception {
 		if (g != null) {
@@ -63,56 +63,102 @@ public class EcoToolsTest extends OWLToolsTestBasics{
 	@Test
 	public void testSimpleEco() throws OWLOntologyCreationException, IOException{
 
-		///
-		/// From: http://purl.obolibrary.org/obo/ECO_0000316
-		/// IGI should be: "experimental evidence used in manual assertion" in:
+	    ///
+	    /// IGI
+	    ///
+	    /// From: http://purl.obolibrary.org/obo/ECO_0000316
+	    /// IGI should be: "experimental evidence used in manual assertion" in:
 	    ///  + evidence
-        ///    + experimental evidence
-        ///        + experimental phenotypic evidence
-        ///            + genetic interaction evidence
-        ///                - genetic interaction evidence used in manual assertion
-		///
+	    ///    + experimental evidence
+	    ///        + experimental phenotypic evidence
+	    ///            + genetic interaction evidence
+	    ///                - genetic interaction evidence used in manual assertion
+	    ///
 
-		// Create EcoTools instance.
-		EcoTools eco = new EcoTools(g, g.getReasoner(), true);
-		
-		// Evidence type closure.
-		Set<OWLClass> ecoClasses = eco.getClassesForGoCode("IGI");
+	    // Create EcoTools instance.
+	    EcoTools eco = new EcoTools(g, g.getReasoner(), true);
 
-		// Hopefully we're just getting one here.
-		assertEquals("Right now, one code (IGI) should go to one ECO term.", 1, ecoClasses.size());
-		OWLClass igi = ecoClasses.iterator().next();
+	    // Evidence type closure.
+	    Set<OWLClass> ecoClasses = eco.getClassesForGoCode("IGI");
 
-		IRI igiIRI = igi.getIRI();
-		assertEquals("http://purl.obolibrary.org/obo/ECO_0000316", igiIRI.toString());
-		String igiId = g.getIdentifier(igi);
-		assertEquals("ECO:0000316", igiId);
+	    // Hopefully we're just getting one here.
+	    assertEquals("Right now, one code (IGI) should go to one ECO term.", 1, ecoClasses.size());
+	    OWLClass igi = ecoClasses.iterator().next();
 
-		String igiLabel = g.getLabel(igi);
-		assertEquals("genetic interaction evidence used in manual assertion", igiLabel);
-				
-		// Since we're reflexive, our six ancestors should be:
-		Set<String> foo = new HashSet<String>();
-	    foo.add("evidence"); // ECO:0000000
-	    foo.add("experimental evidence"); // ECO:0000006
-	    foo.add("experimental phenotypic evidence"); // ECO:0000059
-	    foo.add("genetic interaction evidence"); // ECO:0000011
-	    foo.add(igiLabel); // ECO:0000316
-		
+	    IRI igiIRI = igi.getIRI();
+	    assertEquals("http://purl.obolibrary.org/obo/ECO_0000316", igiIRI.toString());
+	    String igiId = g.getIdentifier(igi);
+	    assertEquals("ECO:0000316", igiId);
+
+	    String igiLabel = g.getLabel(igi);
+	    assertEquals("genetic interaction evidence used in manual assertion", igiLabel);
+
+	    // Since we're reflexive, our ancestors should be:
+	    Set<String> bar = new HashSet<String>();
+	    bar.add("evidence");
+	    bar.add("experimental evidence");
+	    bar.add("experimental phenotypic evidence");
+	    bar.add("experimental phenotypic evidence used in manual assertion");
+	    bar.add("experimental evidence used in manual assertion");
+	    bar.add("genetic interaction evidence");
+	    bar.add(igiLabel);
+
 	    // inferred by reasoner using cross products
-	    foo.add("experimental evidence used in manual assertion"); // ECO:0000269
-	    
-		Set<OWLClass> ecoSuperClasses = eco.getAncestors(ecoClasses, true);
+	    bar.add("evidence used in manual assertion");
 
-		for( OWLClass ec : ecoSuperClasses ){
-			String ec_str_label = g.getLabel(ec);
-			assertTrue("Actual ancestor should have been in hash, not: " + ec_str_label,
-					foo.contains(ec_str_label));
-		}
-			
-		assertEquals(6, ecoSuperClasses.size());
+	    Set<OWLClass> ecoSuperClasses = eco.getAncestors(ecoClasses, true);
+
+	    for( OWLClass ec : ecoSuperClasses ){
+		String ec_str_label = g.getLabel(ec);
+		assertTrue("Actual ancestor should have been in hash, not: " + ec_str_label,
+			   bar.contains(ec_str_label));
+	    }
+
+	    assertEquals(8, ecoSuperClasses.size());
+
+	    ///
+	    /// IEA
+	    ///
+
+	    Set<OWLClass> ecoIeaClasses = eco.getClassesForGoCode("IEA");
+
+	    // Hopefully we're just getting one here?
+	    assertEquals("Right now, one code (IEA) should go to one ECO term.", 1, ecoIeaClasses.size());
+
+
+	    // OWLClass iea = ecoIeaClasses.iterator().next();
+
+	    // IRI ieaIRI = iea.getIRI();
+	    // assertEquals("http://purl.obolibrary.org/obo/ECO_0007669", ieaIRI.toString());
+	    // String ieaId = g.getIdentifier(iea);
+	    // assertEquals("ECO:0007669", ieaId);
+
+	    // String ieaLabel = g.getLabel(iea);
+	    // assertEquals("genetic interaction evidence used in manual assertion", ieaLabel);
+
+	    // // Since we're reflexive, our ancestors should be:
+	    // Set<String> foo = new HashSet<String>();
+	    // foo.add("evidence");
+	    // foo.add("experimental evidence");
+	    // foo.add("experimental phenotypic evidence");
+	    // foo.add("experimental phenotypic evidence used in manual assertion");
+	    // foo.add("experimental evidence used in manual assertion");
+	    // foo.add("genetic interaction evidence");
+	    // foo.add(igiLabel); // ECO:0000316
+
+	    // // inferred by reasoner using cross products
+	    // foo.add("evidence used in manual assertion");
+
+	    // Set<OWLClass> ecoIeaSuperClasses = eco.getAncestors(ecoClasses, true);
+
+	    // for( OWLClass ec : ecoIeaSuperClasses ){
+	    // 	String ec_str_label = g.getLabel(ec);
+	    // 	assertTrue("Actual ancestor should have been in hash, not: " + ec_str_label,
+	    // 		   foo.contains(ec_str_label));
+	    // }
+
+	    // assertEquals(8, ecoIeaSuperClasses.size());
 
 	}
-	
 
 }

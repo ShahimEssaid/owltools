@@ -690,7 +690,11 @@ public class GafSolrDocumentLoader extends AbstractSolrLoader {
 			ecoClosureMap.put(currentId, currentLbl);
 
 			List<String> subsets = graph.getSubsets(cls);
-			if (ecoSubsetName != null && subsets.contains(ecoSubsetName)) {
+			// TODO: make this more resilient. For rationale see:
+			// https://github.com/geneontology/amigo/issues/433
+			if (ecoSubsetName != null && (subsets.contains(ecoSubsetName) ||
+						      subsets.contains(ecoSubsetName.replace('_',':'))
+						     ) {
 				ecoSubsetIDClosure.add(currentId);
 				ecoSubsetLabelClosure.add(currentLbl);
 				ecoSubsetClosureMap.put(currentId, currentLbl);

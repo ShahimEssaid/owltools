@@ -1,0 +1,69 @@
+[Term]
+id: G:1
+
+[Term]
+id: GY:1
+
+[Term]
+id: X:1
+intersection_of: G:1
+intersection_of: part_of Y:1
+
+[Term]
+id: X:2
+is_a: X:1
+intersection_of: G:1
+intersection_of: part_of Y:2
+
+[Term]
+id: X:3
+is_a: X:2
+intersection_of: G:1
+intersection_of: part_of Y:3
+
+[Term]
+id: X:4
+is_a: X:3
+intersection_of: G:1
+intersection_of: part_of Y:4
+
+[Term]
+id: Y:1
+intersection_of: GY:1
+intersection_of: part_of Z:1
+
+[Term]
+id: Y:2
+is_a: Y:1
+intersection_of: GY:1
+intersection_of: part_of Z:2
+
+[Term]
+id: Y:3
+is_a: Y:2
+intersection_of: GY:1
+intersection_of: part_of Z:3
+
+[Term]
+id: Y:4
+is_a: Y:3
+intersection_of: GY:1
+intersection_of: part_of Z:4
+
+[Term]
+id: Z:1
+
+[Term]
+id: Z:2
+is_a: Z:1
+
+[Term]
+id: Z:3
+is_a: Z:2
+
+[Term]
+id: Z:4
+is_a: Z:3
+
+[Typedef]
+id: part_of

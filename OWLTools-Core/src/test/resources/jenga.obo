@@ -1,0 +1,54 @@
+[Term]
+id: X:1
+equivalent_to: Y:1
+
+[Term]
+id: X:2
+is_a: X:1
+equivalent_to: Y:2
+
+[Term]
+id: X:3
+is_a: X:2
+equivalent_to: Y:3
+
+[Term]
+id: X:4
+is_a: X:3
+equivalent_to: Y:4
+
+
+[Term]
+id: Y:1
+equivalent_to: Z:1
+
+[Term]
+id: Y:2
+is_a: Y:1
+equivalent_to: Z:2
+
+[Term]
+id: Y:3
+is_a: Y:2
+equivalent_to: Z:3
+
+[Term]
+id: Y:4
+is_a: Y:3
+equivalent_to: Z:4
+
+
+[Term]
+id: Z:1
+
+[Term]
+id: Z:2
+is_a: Z:1
+
+[Term]
+id: Z:3
+is_a: Z:2
+
+[Term]
+id: Z:4
+is_a: Z:3

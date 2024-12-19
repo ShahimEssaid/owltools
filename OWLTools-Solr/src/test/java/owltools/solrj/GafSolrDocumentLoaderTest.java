@@ -26,6 +26,7 @@ import owltools.io.ParserWrapper;
 public class GafSolrDocumentLoaderTest {
 
 	private static int solrCount = 0;
+	private static int solrCountWithRegulatesOnly = 0;
 	private static OWLGraphWrapper graph;
 	private static TaxonTools taxonTools = null;
 	private static GafSolrDocumentLoader loader;
@@ -37,9 +38,12 @@ public class GafSolrDocumentLoaderTest {
 			@Override
 			protected void addToServer(Collection<SolrInputDocument> docs)
 					throws SolrServerException, IOException {
+				for (SolrInputDocument doc: docs) {
+					if (doc.toString().contains("regulates_only_closure"))
+						solrCountWithRegulatesOnly +=1 ;
+				}
 				solrCount += docs.size();
 			}
-			
 		};
 		ParserWrapper pw = new ParserWrapper();
 		pw.addIRIMapper(new CatalogXmlIRIMapper("../OWLTools-Annotation/src/test/resources/rules/ontology/extensions/catalog-v001.xml"));
@@ -85,6 +89,6 @@ public class GafSolrDocumentLoaderTest {
 		loader.load();
 
 		assertTrue(solrCount > 0);
+		assertTrue(solrCountWithRegulatesOnly > 0);
 	}
-
 }

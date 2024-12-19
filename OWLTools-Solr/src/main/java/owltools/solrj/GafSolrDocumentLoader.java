@@ -330,6 +330,8 @@ public class GafSolrDocumentLoader extends AbstractSolrLoader {
 		// added at the end of this section.
 		Map<String, String> isap_map = new HashMap<String, String>();
 		Map<String, String> reg_map = new HashMap<String, String>();
+		Map<String, String> reg_only_map = new HashMap<String, String>();
+
 		for (GeneAnnotation a : gafDocument.getGeneAnnotations(e.getId())) {
 			SolrInputDocument annotation_doc = new SolrInputDocument();
 
@@ -441,6 +443,12 @@ public class GafSolrDocumentLoader extends AbstractSolrLoader {
 				Map<String, String> curr_reg_map = addClosureToAnnAndBio(reg, "regulates_closure", "regulates_closure_label", "regulates_closure_map",
 						  			               cls, graph, annotation_doc, bioentity_doc, a.isNegated());
 				reg_map.putAll(curr_reg_map); // add to aggregate map
+
+				// Regulates ONLY closures.
+				List<String> reg_only = RelationSets.getRelationSet(RelationSets.REGULATES_ONLY);
+				Map<String, String> curr_reg_only_map = addClosureToAnnAndBio(reg_only, "regulates_only_closure", "regulates_only_closure_label", "regulates_only_closure_map",
+						  			               cls, graph, annotation_doc, bioentity_doc, a.isNegated());
+				reg_only_map.putAll(curr_reg_only_map); // add to aggregate map
 			}
 
 			// Let's piggyback on a little of the work above and cache the extra stuff that we'll be adding to the bioenity at the end
@@ -547,7 +555,11 @@ public class GafSolrDocumentLoader extends AbstractSolrLoader {
 			String jsonized_cmap = gson.toJson(reg_map);
 			bioentity_doc.addField("regulates_closure_map", jsonized_cmap);
 		}
-
+		if( ! reg_only_map.isEmpty() ){
+			String jsonized_cmap = gson.toJson(reg_only_map);
+			bioentity_doc.addField("regulates_only_closure_map", jsonized_cmap);
+		}
+		
 		// Add c5 to bioentity.
 		// Compile closure map to JSON and add to the document.
 		String jsonized_direct_map = null;

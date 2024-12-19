@@ -7,7 +7,7 @@ public class RelationSets {
 
     public static final String ISA_PARTOF = "is_a/part_of";
     public static final String REGULATES = "regulates/is_a/part_of";
-
+    public static final String REGULATES_ONLY = "regulates/part_of";
     /*
      * Should be using this in most cases.
      */
@@ -24,6 +24,10 @@ public class RelationSets {
 				rel_ids.add("BFO:0000050");
 			}else if( relset.equals(REGULATES) ){
 				rel_ids.add("BFO:0000050");
+				rel_ids.add("RO:0002211");
+				rel_ids.add("RO:0002212");
+				rel_ids.add("RO:0002213");
+			}else if( relset.equals(REGULATES_ONLY) ){
 				rel_ids.add("RO:0002211");
 				rel_ids.add("RO:0002212");
 				rel_ids.add("RO:0002213");
